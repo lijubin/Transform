@@ -13,6 +13,10 @@
 
 + (instancetype)ljbObjectWithDict:(NSDictionary *)dict {
     NSObject *object = [[self alloc] init];
+    if ([dict isEqual:[NSNull null]]
+        || !dict) {
+        return object;
+    }
     unsigned int propertyCount = 0;
     objc_property_t *properties = class_copyPropertyList([self class], &propertyCount);
     for (unsigned int i = 0; i < propertyCount; i++) {
@@ -45,6 +49,10 @@
 
 + (NSArray *)ljbObjectWithArray:(NSArray *)array {
     NSMutableArray *resultArray = [NSMutableArray array];
+    if ([array isEqual:[NSNull null]]
+        || !array.count) {
+        return resultArray;
+    }
     for (NSObject *tmpObject in array) {
         if ([tmpObject isKindOfClass:[NSDictionary class]]) {
             NSObject *object = [self ljbObjectWithDict:(NSDictionary *)tmpObject];
