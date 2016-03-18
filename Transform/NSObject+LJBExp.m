@@ -17,12 +17,11 @@
         || !dict) {
         return object;
     }
-    unsigned int propertyCount = 0;
-    objc_property_t *properties = class_copyPropertyList([self class], &propertyCount);
-    for (unsigned int i = 0; i < propertyCount; i++) {
-        objc_property_t property = properties[i];
-        const char * propertyName = property_getName(property);
-        NSString *mapKey = [[NSString alloc] initWithUTF8String:propertyName];
+    unsigned int count = 0;
+    Ivar *ivarList = class_copyIvarList(self, &count);
+    for (unsigned int i = 0; i < count; i++) {
+        Ivar ivar = ivarList[i];
+        NSString *mapKey = [NSString stringWithUTF8String:ivar_getName(ivar)];
         NSString *dictKey = mapKey;
         if ([mapKey hasPrefix:@"_"]) {
             NSMutableString *tmpStr = [NSMutableString stringWithString:mapKey];
@@ -38,9 +37,22 @@
             [tmpStr replaceCharactersInRange:range withString:@""];
             dictKey = tmpStr;
         }
+        //二级转换
+        NSString *ivarType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)];
         if (![dict[dictKey] isEqual:[NSNull null]]
             && dict[dictKey]) {
-            [object setValue:dict[dictKey] forKey:mapKey];
+            if ([dict[dictKey] isKindOfClass:[NSDictionary class]]
+                && ![ivarType containsString:@"NS"]) {
+                ivarType = [ivarType stringByReplacingOccurrencesOfString:@"@\"" withString:@""];
+                ivarType = [ivarType stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                // 获取类
+                Class modelClass = NSClassFromString(ivarType);
+                
+                id value = [modelClass ljbObjectWithDict:dict[dictKey]];
+                [object setValue:value forKey:mapKey];
+            } else {
+                [object setValue:dict[dictKey] forKey:mapKey];
+            }
         }
     }
     
