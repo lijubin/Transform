@@ -53,6 +53,17 @@
             } else {
                 [object setValue:dict[dictKey] forKey:mapKey];
             }
+        }  else if ([dict[dictKey] isEqual:[NSNull null]]
+                   || dict[dictKey] == nil) {
+            ivarType = [ivarType stringByReplacingOccurrencesOfString:@"@\"" withString:@""];
+            ivarType = [ivarType stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+            // 获取类
+            if ([ivarType containsString:@"NS"]) {
+                Class modelClass = NSClassFromString(ivarType);
+                [object setValue:[modelClass new] forKey:mapKey];
+            } else {
+                NSLog(@"非系统类型对象:%@",ivarType);
+            }
         }
     }
     
