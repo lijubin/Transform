@@ -1,9 +1,9 @@
 //
-//  NSObject+LJBExp.h
-//  一公里
+//  NSObject+LJBExp.m
+//  Transform
 //
-//  Created by lijubin on 16/1/5.
-//  Copyright © 2016年 viewcreator3d. All rights reserved.
+//  Created by 李居彬 on 16/1/25.
+//  Copyright © 2016年 ljb. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
