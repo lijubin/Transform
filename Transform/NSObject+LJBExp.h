@@ -36,6 +36,12 @@
  */
 + (void)writeDataCache:(NSString *)dataCacheId dataLists:(NSArray *)dataLists;
 
+/**
+ *  读取缓存数据列表
+ *
+ *  @param dataCacheId 数据Id
+ *  @return 转换模型后的缓存数据
+ */
 + (NSArray *)readDataCache:(NSString *)dataCacheId;
 
 @end
