@@ -2,7 +2,7 @@
 //  NSObject+LJBExp.h
 //  一公里
 //
-//  Created by liuguopan on 16/1/5.
+//  Created by lijubin on 16/1/5.
 //  Copyright © 2016年 viewcreator3d. All rights reserved.
 //
 
