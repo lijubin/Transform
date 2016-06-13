@@ -28,7 +28,7 @@
         dict1[@"tmpArry"] = @[[NSDictionary dictionaryWithObjectsAndKeys:@"1",@"score",@"2",@"lesson", nil],[NSDictionary dictionaryWithObjectsAndKeys:@"1",@"score",@"2",@"lesson", nil]];
         [arr1 addObject:dict1];
     }
-    //解析 模型中包含模型的json
+    //解析 模型中包含模型的 json
     NSMutableArray *result1 = [NSMutableArray array];
     for (NSDictionary *dict in arr1) {
         Model1 *model1 = [Model1 ljbObjectWithDict:dict];
