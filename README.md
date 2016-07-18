@@ -1,6 +1,7 @@
 # Transform
 字典转模型，数组转模型。模型中包含模型的转换。（模型中有关键字时 请在前面加_下划线的个数不限制如_id，__id）
 带数组的json需要转换的可以通过。定义同名协议来实现自动转换。@property(nonatomic,strong)NSArray<YFReceiptAddress> *receipt_address;指定类型。
+//关键字作为成员变量时，在模型中将该字段加下划线就可，如服务器返回的是id，model里面定义_id即可实现转换。
 @protocol YFReceiptAddress <NSObject>
 
 @end
