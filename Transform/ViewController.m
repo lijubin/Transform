@@ -32,7 +32,7 @@
     NSMutableArray *result1 = [NSMutableArray array];
     for (NSDictionary *dict in arr1) {
         Model1 *model1 = [Model1 ljbObjectWithDict:dict];
-        model1.tmpArry = [Model2 ljbObjectWithArray:model1.tmpArry];
+        //        model1.tmpArry = [Model2 ljbObjectWithArray:model1.tmpArry];
         [result1 addObject:model1];
     }
     //
