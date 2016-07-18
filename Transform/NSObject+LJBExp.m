@@ -39,10 +39,11 @@
         }
         //二级转换
         NSString *ivarType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)];
+        
         if (![dict[dictKey] isEqual:[NSNull null]]
             && dict[dictKey]) {
             if ([dict[dictKey] isKindOfClass:[NSDictionary class]]
-                && ![ivarType containsString:@"NS"]) {
+                && ![ivarType containsString:@"NS"]) {//字典转模型
                 ivarType = [ivarType stringByReplacingOccurrencesOfString:@"@\"" withString:@""];
                 ivarType = [ivarType stringByReplacingOccurrencesOfString:@"\"" withString:@""];
                 // 获取类
@@ -50,8 +51,31 @@
                 
                 id value = [modelClass ljbObjectWithDict:dict[dictKey]];
                 [object setValue:value forKey:mapKey];
-            } else {
-                [object setValue:dict[dictKey] forKey:mapKey];
+            } else {//数组转模型
+                //数组转模型的使用。数组需要通过协议来使用转换。
+                //如：@property(nonatomic,strong)NSArray<YFReceiptAddress> *receipt_address;//收货地址列表
+                if ([ivarType containsString:@"NSArray"]
+                    && [ivarType containsString:@"<"]
+                    && [ivarType containsString:@">"]
+                    && [dict[dictKey] isKindOfClass:[NSArray class]]) {//定义了需要转换的数组时进行多级转换
+                    ivarType = [ivarType stringByReplacingOccurrencesOfString:@"@\"" withString:@""];
+                    ivarType = [ivarType stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                    //获取泛型类
+                    NSRange startRange = [ivarType rangeOfString:@"<"];
+                    NSRange endRange = [ivarType rangeOfString:@">"];
+                    if (startRange.location != NSNotFound
+                        && endRange.location != NSNotFound) {
+                        NSString *modelString = [ivarType substringWithRange:NSMakeRange(startRange.location + startRange.length,endRange.location - (startRange.location + startRange.length))];
+                        // 获取类
+                        Class modelClass = NSClassFromString(modelString);
+                        id value = [modelClass ljbObjectWithArray:dict[dictKey]];
+                        [object setValue:value forKey:mapKey];
+                    } else {
+                        [object setValue:dict[dictKey] forKey:mapKey];
+                    }
+                } else {//不转换
+                    [object setValue:dict[dictKey] forKey:mapKey];
+                }
             }
         }  else if ([dict[dictKey] isEqual:[NSNull null]]
                     || dict[dictKey] == nil) {
@@ -126,7 +150,6 @@
                     dictKey = tmpStr;
                 }
                 //模型转字典
-                
                 if (![dataDict[dictKey] isEqual:[NSNull null]]
                     && dataDict[dictKey]) {
                     if ([dataDict[dictKey] isKindOfClass:[NSString class]]
