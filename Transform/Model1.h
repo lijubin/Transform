@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Model2.h"
 
 @interface Model1 : NSObject
 
@@ -14,6 +15,6 @@
 @property (nonatomic,copy) NSString *name;
 @property (nonatomic,copy) NSString *age;
 
-@property(strong,nonatomic) NSArray *tmpArry;
+@property(strong,nonatomic) NSArray<Model2> *tmpArry;
 
 @end
