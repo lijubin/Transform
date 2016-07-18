@@ -8,6 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol Model2 <NSObject>
+
+@end
+
 @interface Model2 : NSObject
 
 @property (nonatomic,copy) NSString *score;
