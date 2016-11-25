@@ -23,19 +23,25 @@
         Ivar ivar = ivarList[i];
         NSString *mapKey = [NSString stringWithUTF8String:ivar_getName(ivar)];
         NSString *dictKey = mapKey;
-        if ([mapKey hasPrefix:@"_"]) {
-            NSMutableString *tmpStr = [NSMutableString stringWithString:mapKey];
-            int lenght = 0;
-            for (int i = 0; i < tmpStr.length; i++) {
-                if ([[tmpStr substringWithRange:NSMakeRange(i, 1)] isEqualToString:@"_"]) {
-                    lenght++;
-                } else {
-                    break;
+        if ([dictKey hasPrefix:@"_"]) {
+            dictKey = [dictKey substringFromIndex:1];
+        }
+        if ([dict[dictKey] isEqual:[NSNull null]]
+            || !dict[dictKey]) {
+            if ([dictKey hasPrefix:@"_"]) {
+                NSMutableString *tmpStr = [NSMutableString stringWithString:dictKey];
+                int lenght = 0;
+                for (int i = 0; i < tmpStr.length; i++) {
+                    if ([[tmpStr substringWithRange:NSMakeRange(i, 1)] isEqualToString:@"_"]) {
+                        lenght++;
+                    } else {
+                        break;
+                    }
                 }
+                NSRange range = NSMakeRange(0, lenght);
+                [tmpStr replaceCharactersInRange:range withString:@""];
+                dictKey = tmpStr;
             }
-            NSRange range = NSMakeRange(0, lenght);
-            [tmpStr replaceCharactersInRange:range withString:@""];
-            dictKey = tmpStr;
         }
         //二级转换
         NSString *ivarType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)];
@@ -74,7 +80,23 @@
                         [object setValue:dict[dictKey] forKey:mapKey];
                     }
                 } else {//不转换
-                    [object setValue:dict[dictKey] forKey:mapKey];
+                    //类型判断。类型不一致时，强制类型转换
+                    ivarType = [ivarType stringByReplacingOccurrencesOfString:@"@\"" withString:@""];
+                    ivarType = [ivarType stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+                    Class modelClass = NSClassFromString(ivarType);
+                    if ([dict[dictKey] isKindOfClass:[modelClass class]]) {
+                        [object setValue:dict[dictKey] forKey:mapKey];
+                    } else {
+                        if ([ivarType isEqualToString:@"NSString"]) {
+                            [object setValue:[NSString stringWithFormat:@"%@",dict[dictKey]] forKey:mapKey];
+                        } else if ([ivarType isEqualToString:@"NSNumber"]) {
+                            NSString *tmpStr = [NSString stringWithFormat:@"%@",dict[dictKey]];
+                            NSNumber *numTemp = [NSNumber numberWithFloat:[tmpStr floatValue]];
+                            [object setValue:numTemp forKey:mapKey];
+                        } else {
+                            [object setValue:dict[dictKey] forKey:mapKey];
+                        }
+                    }
                 }
             }
         }  else if ([dict[dictKey] isEqual:[NSNull null]]
@@ -86,7 +108,7 @@
                 Class modelClass = NSClassFromString(ivarType);
                 [object setValue:[modelClass new] forKey:mapKey];
             } else {
-                NSLog(@"非系统类型对象:%@",ivarType);
+//                NSLog(@"非系统类型对象:%@",ivarType);
             }
         }
     }
